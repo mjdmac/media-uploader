@@ -159,7 +159,7 @@ const FileUploader: React.FC = () => {
         <div className="flex items-center justify-center mb-4">
           <Heart className="h-8 w-8 text-blue-300 mr-3 animate-pulse" />
           <h1 className="text-5xl font-bold text-white drop-shadow-2xl bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent">
-            Wedding Memories
+            JM and MJ Wedding Memories
           </h1>
           <Heart className="h-8 w-8 text-blue-300 ml-3 animate-pulse" />
         </div>
