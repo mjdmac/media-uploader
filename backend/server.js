@@ -81,9 +81,6 @@ const upload = multer({
 // In-memory storage for uploaded files metadata
 let uploadedFiles = [];
 
-// In-memory storage for uploaded files metadata
-let uploadedFiles = [];
-
 // Routes
 app.get("/health", (req, res) => {
   res.json({
