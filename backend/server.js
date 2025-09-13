@@ -23,6 +23,13 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -33,6 +40,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Configure multer for temporary file storage
 // Configure multer for temporary file storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -107,6 +115,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
+    console.log(`Processing file: ${req.file.originalname}`);
+    console.log(`Temporary file: ${req.file.filename}`);
     console.log(`Processing file: ${req.file.originalname}`);
     console.log(`Temporary file: ${req.file.filename}`);
     console.log(`Size: ${req.file.size} bytes`);

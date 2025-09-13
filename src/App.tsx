@@ -1,5 +1,6 @@
 import React from 'react';
 import FileUploader from './components/FileUploader';
+import FileList from './components/FileList';
 
 function App() {
   return (
@@ -54,6 +55,9 @@ function App() {
       {/* Content */}
       <div className="relative z-10">
         <FileUploader />
+        <div className="mt-16">
+          <FileList />
+        </div>
       </div>
     </div>
   );
