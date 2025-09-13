@@ -1,21 +1,33 @@
 # media-uploader
-Specifically made to upload photos and videos for a wedding event
+Specifically made to upload photos and videos for a wedding event using Cloudinary storage
 
 
 # Local Wedding Photo & Video Uploader Setup
 
-This is a beautiful wedding photo and video uploader that stores files locally on your server. Perfect for collecting memories from your special day!
+This is a beautiful wedding photo and video uploader that stores files in Cloudinary cloud storage. Perfect for collecting memories from your special day!
 
 ## Features ✨
 
 - **Beautiful Design**: Elegant gradient background with animated floral elements
 - **Drag & Drop**: Intuitive file upload with visual feedback
 - **Progress Tracking**: Real-time upload progress with smooth animations
-- **Local Storage**: Files are stored securely on your server
+- **Cloud Storage**: Files are stored securely in Cloudinary with automatic optimization
 - **File Management**: View, download, and manage uploaded files
 - **Responsive**: Works perfectly on all devices
+- **Image Optimization**: Automatic image optimization and format conversion
+- **CDN Delivery**: Fast global content delivery through Cloudinary's CDN
 
 ## Quick Setup
+
+### 0. Cloudinary Configuration
+
+Create a `backend/.env` file with your Cloudinary credentials:
+```
+CLOUD_NAME=your_cloud_name
+CLOUD_API_KEY=your_api_key
+CLOUD_API_SECRET=your_api_secret
+PORT=3001
+```
 
 ### 1. Install Dependencies
 
@@ -51,30 +63,35 @@ Open your browser and go to http://localhost:5173 to start uploading your weddin
 
 ## File Storage
 
-- **Location**: Files are stored in `backend/uploads/` folder
-- **Naming**: Files are automatically renamed with timestamps to prevent conflicts
+- **Location**: Files are stored in Cloudinary cloud storage
+- **Organization**: Files are organized in the `wedding-memories` folder
+- **Naming**: Files are automatically assigned unique public IDs
 - **Size Limit**: 500MB per file (configurable in server.js)
 - **Types**: Images and videos only
-- **Access**: Files can be accessed via `http://localhost:3001/uploads/filename`
+- **Access**: Files are accessible via Cloudinary's CDN URLs
+- **Optimization**: Automatic image optimization and format conversion
 
 ## API Endpoints
 
 ### Upload File
 - **POST** `/upload`
 - Upload a single file
-- Returns file information and access URL
+- Uploads to Cloudinary and returns file information with CDN URL
 
 ### Get File List
 - **GET** `/files`
-- Returns list of all uploaded files with metadata
+- Returns list of all uploaded files with Cloudinary metadata
 
 ### Delete File
-- **DELETE** `/files/:filename`
-- Delete a specific file from the server
+- **DELETE** `/files/:cloudinaryId`
+- Delete a specific file from Cloudinary
 
+### Get Optimized Image
+- **GET** `/optimize/:cloudinaryId?width=300&height=200&quality=auto`
+- Get optimized image URL with custom dimensions and quality
 ### Health Check
 - **GET** `/health`
-- Check server status and configuration
+- Check server status and Cloudinary configuration
 
 ## Configuration
 
@@ -99,40 +116,49 @@ fileFilter: (req, file, cb) => {
 ```
 
 ### Port Configuration
-Create a `.env` file in the backend folder:
+Update the `backend/.env` file:
 ```
+CLOUD_NAME=your_cloud_name
+CLOUD_API_KEY=your_api_key
+CLOUD_API_SECRET=your_api_secret
 PORT=3001
 ```
+
+### Cloudinary Settings
+- **Folder Organization**: Files are stored in `wedding-memories` folder
+- **Auto-optimization**: Images are automatically optimized for web delivery
+- **Format Detection**: Automatic format selection for best performance
+- **CDN Delivery**: Global content delivery network for fast access
 
 ## File Management
 
 ### Viewing Files
-- Click "View File" button on successfully uploaded files
-- Or visit `http://localhost:3001/uploads/filename` directly
+- Click "View File" button to open files via Cloudinary CDN
+- Files are delivered through Cloudinary's optimized CDN
 
 ### Accessing All Files
-Visit `http://localhost:3001/files` to see a JSON list of all uploaded files with metadata.
+Visit `http://localhost:3001/files` to see a JSON list of all uploaded files with Cloudinary metadata.
 
-### Manual File Management
-Files are stored in `backend/uploads/` and can be managed directly:
-- Copy files to backup location
-- Delete unwanted files
-- Organize into subfolders (requires code modification)
+### Cloudinary Dashboard
+- Access your files through Cloudinary's web dashboard
+- Advanced media management and analytics
+- Bulk operations and transformations
 
 ## Production Deployment
 
 ### Security Considerations
 1. **File Validation**: Only images and videos are allowed
 2. **Size Limits**: 500MB maximum file size
-3. **Unique Naming**: Prevents file conflicts and overwrites
+3. **Unique IDs**: Cloudinary assigns unique public IDs
 4. **CORS**: Configured for local development (update for production)
+5. **Secure URLs**: All files served over HTTPS via Cloudinary
 
 ### For Production Use
 1. **HTTPS**: Use HTTPS in production
 2. **Authentication**: Consider adding user authentication
-3. **Backup**: Set up regular backups of the uploads folder
-4. **Storage**: Consider cloud storage for scalability
-5. **CDN**: Use a CDN for better file delivery performance
+3. **Backup**: Cloudinary provides automatic backups and redundancy
+4. **Scaling**: Cloudinary handles scaling automatically
+5. **CDN**: Built-in global CDN for optimal performance
 
 ## Customization
 
@@ -144,9 +170,9 @@ Files are stored in `backend/uploads/` and can be managed directly:
 ### Adding Features
 - **User Authentication**: Add login system
 - **File Categories**: Organize by photo/video type
-- **Thumbnails**: Generate thumbnails for images
-- **Compression**: Add image/video compression
-- **Metadata**: Extract and display EXIF data
+- **Thumbnails**: Use Cloudinary's transformation API for thumbnails
+- **Advanced Transformations**: Leverage Cloudinary's powerful transformation features
+- **AI Features**: Use Cloudinary's AI-powered features for auto-tagging and content analysis
 
 ## Troubleshooting
 
@@ -159,17 +185,25 @@ Files are stored in `backend/uploads/` and can be managed directly:
 2. **File upload fails**
    - Check file size (max 500MB)
    - Verify file type (images/videos only)
-   - Ensure uploads folder exists and is writable
+   - Verify Cloudinary credentials in .env file
+   - Check Cloudinary account limits
 
-3. **Files not accessible**
-   - Verify backend server is serving static files
-   - Check file permissions in uploads folder
+3. **Cloudinary upload fails**
+   - Verify API credentials are correct
+   - Check Cloudinary account status and limits
+   - Ensure network connectivity
 
 4. **Frontend not connecting to backend**
    - Ensure backend is running on port 3001
    - Check for CORS errors in browser console
 
+5. **Cloudinary configuration issues**
+   - Verify .env file exists in backend folder
+   - Check that all three Cloudinary credentials are set
+   - Test credentials with health check endpoint
+
 ### Logs
 - Backend logs appear in the terminal where you ran `npm run dev`
 - Frontend errors appear in browser developer console
+- Cloudinary upload status is logged in backend console
 
