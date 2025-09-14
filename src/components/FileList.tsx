@@ -55,7 +55,7 @@ const FileList: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get<FilesResponse>('http://localhost:3001/files');
+      const response = await axios.get<FilesResponse>('/files');
       setFiles(response.data.files);
       setTotalFiles(response.data.totalFiles);
       setTotalSize(response.data.totalSize);
@@ -72,7 +72,7 @@ const FileList: React.FC = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:3001/files/${cloudinaryId}`);
+      await axios.delete(`/files/${cloudinaryId}`);
       await fetchFiles(); // Refresh the list
     } catch (err) {
       alert(axios.isAxiosError(err) ? err.response?.data?.error || 'Failed to delete file' : 'Failed to delete file');

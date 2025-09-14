@@ -93,7 +93,7 @@ const FileUploader: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/upload",
+        "/upload",
         formData,
         {
           headers: {
