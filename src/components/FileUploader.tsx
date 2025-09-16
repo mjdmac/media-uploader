@@ -26,6 +26,11 @@ const FileUploader: React.FC = () => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
+  const BACKEND_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3001"
+      : import.meta.env.VITE_BACKEND_URL;
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -92,26 +97,22 @@ const FileUploader: React.FC = () => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post(
-        "/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / (progressEvent.total || 1)
-            );
+      const response = await axios.post(`${BACKEND_URL}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          );
 
-            setFiles((prev) =>
-              prev.map((f, i) =>
-                i === fileIndex ? { ...f, progress: percentCompleted } : f
-              )
-            );
-          },
-        }
-      );
+          setFiles((prev) =>
+            prev.map((f, i) =>
+              i === fileIndex ? { ...f, progress: percentCompleted } : f
+            )
+          );
+        },
+      });
 
       // Update file status to success
       setFiles((prev) =>
@@ -121,7 +122,7 @@ const FileUploader: React.FC = () => {
                 ...f,
                 status: "success" as const,
                 progress: 100,
-                fileUrl: response.data.file.url,
+                fileUrl: response.data.url,
               }
             : f
         )

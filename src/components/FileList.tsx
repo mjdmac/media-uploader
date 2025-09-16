@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { RefreshCw, Eye, Trash2, Download, Calendar, FileIcon, Camera, Video, HardDrive } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  RefreshCw,
+  Eye,
+  Trash2,
+  Download,
+  Calendar,
+  FileIcon,
+  Camera,
+  Video,
+  HardDrive,
+} from "lucide-react";
+import axios from "axios";
 
 interface CloudinaryFile {
   originalName: string;
-  filename: string;
   size: number;
   mimetype: string;
+  resource_type: string;
   url: string;
-  cloudinaryId: string;
-  uploadDate: string;
+  public_id: string;
+  created_at: string;
   format: string;
   width?: number;
   height?: number;
-  resourceType: string;
 }
 
 interface FilesResponse {
@@ -29,23 +38,28 @@ const FileList: React.FC = () => {
   const [totalFiles, setTotalFiles] = useState(0);
   const [totalSize, setTotalSize] = useState(0);
 
+  const BACKEND_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3001"
+      : import.meta.env.VITE_BACKEND_URL;
+
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
   const getFileIcon = (mimetype: string, resourceType: string) => {
-    if (resourceType === 'image' || mimetype.startsWith('image/')) {
+    if (resourceType === "image" || mimetype.startsWith("image/")) {
       return <Camera className="h-5 w-5 text-blue-500" />;
-    } else if (resourceType === 'video' || mimetype.startsWith('video/')) {
+    } else if (resourceType === "video" || mimetype.startsWith("video/")) {
       return <Video className="h-5 w-5 text-purple-500" />;
     }
     return <FileIcon className="h-5 w-5 text-gray-500" />;
@@ -55,12 +69,16 @@ const FileList: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get<FilesResponse>('/files');
+      const response = await axios.get<FilesResponse>(`${BACKEND_URL}/files`);
       setFiles(response.data.files);
       setTotalFiles(response.data.totalFiles);
       setTotalSize(response.data.totalSize);
     } catch (err) {
-      setError(axios.isAxiosError(err) ? err.response?.data?.error || 'Failed to fetch files' : 'Failed to fetch files');
+      setError(
+        axios.isAxiosError(err)
+          ? err.response?.data?.error || "Failed to fetch files"
+          : "Failed to fetch files"
+      );
     } finally {
       setLoading(false);
     }
@@ -72,15 +90,19 @@ const FileList: React.FC = () => {
     }
 
     try {
-      await axios.delete(`/files/${cloudinaryId}`);
+      await axios.delete(`${BACKEND_URL}/files/${cloudinaryId}`);
       await fetchFiles(); // Refresh the list
     } catch (err) {
-      alert(axios.isAxiosError(err) ? err.response?.data?.error || 'Failed to delete file' : 'Failed to delete file');
+      alert(
+        axios.isAxiosError(err)
+          ? err.response?.data?.error || "Failed to delete file"
+          : "Failed to delete file"
+      );
     }
   };
 
   const openFile = (url: string) => {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   useEffect(() => {
@@ -133,7 +155,9 @@ const FileList: React.FC = () => {
           </div>
           <div className="flex items-center">
             <HardDrive className="h-5 w-5 mr-2" />
-            <span className="font-semibold">{formatFileSize(totalSize)} Total</span>
+            <span className="font-semibold">
+              {formatFileSize(totalSize)} Total
+            </span>
           </div>
         </div>
       </div>
@@ -152,8 +176,12 @@ const FileList: React.FC = () => {
       {files.length === 0 ? (
         <div className="bg-white/90 backdrop-blur-lg rounded-2xl border border-white/30 p-12 shadow-2xl text-center">
           <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-semibold text-gray-700 mb-2">No files uploaded yet</h3>
-          <p className="text-gray-500">Upload some beautiful wedding memories to see them here!</p>
+          <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+            No files uploaded yet
+          </h3>
+          <p className="text-gray-500">
+            Upload some beautiful wedding memories to see them here!
+          </p>
         </div>
       ) : (
         <div className="bg-white/90 backdrop-blur-lg rounded-2xl border border-white/30 shadow-2xl overflow-hidden">
@@ -162,22 +190,42 @@ const FileList: React.FC = () => {
             <table className="w-full">
               <thead className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">File</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Size</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Dimensions</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">Upload Date</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                    File
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                    Size
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                    Dimensions
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                    Upload Date
+                  </th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {files.map((file, index) => (
-                  <tr key={file.cloudinaryId} className={`hover:bg-blue-50 transition-colors duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                  <tr
+                    key={file.public_id}
+                    className={`hover:bg-blue-50 transition-colors duration-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    }`}
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        {getFileIcon(file.mimetype, file.resourceType)}
+                        {getFileIcon(file.resource_type, file.mimetype)}
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={file.originalName}>
+                          <div
+                            className="text-sm font-medium text-gray-900 truncate max-w-xs"
+                            title={file.originalName}
+                          >
                             {file.originalName}
                           </div>
                           <div className="text-xs text-gray-500">
@@ -187,24 +235,28 @@ const FileList: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        file.resourceType === 'image' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-purple-100 text-purple-800'
-                      }`}>
-                        {file.resourceType === 'image' ? 'Photo' : 'Video'}
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          file.resource_type === "image"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-purple-100 text-purple-800"
+                        }`}
+                      >
+                        {file.resource_type === "image" ? "Photo" : "Video"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {formatFileSize(file.size)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {file.width && file.height ? `${file.width} × ${file.height}` : 'N/A'}
+                      {file.width && file.height
+                        ? `${file.width} × ${file.height}`
+                        : "N/A"}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                        {formatDate(file.uploadDate)}
+                        {formatDate(file.created_at)}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -225,7 +277,9 @@ const FileList: React.FC = () => {
                           <Download className="h-4 w-4" />
                         </a>
                         <button
-                          onClick={() => deleteFile(file.cloudinaryId, file.originalName)}
+                          onClick={() =>
+                            deleteFile(file.public_id, file.originalName)
+                          }
                           className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-full transition-all duration-200"
                           title="Delete file"
                         >
@@ -242,35 +296,46 @@ const FileList: React.FC = () => {
           {/* Mobile Card View */}
           <div className="lg:hidden space-y-4 p-4">
             {files.map((file) => (
-              <div key={file.cloudinaryId} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+              <div
+                key={file.public_id}
+                className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center flex-1 min-w-0">
-                    {getFileIcon(file.mimetype, file.resourceType)}
+                    {getFileIcon(file.resource_type, file.mimetype)}
                     <div className="ml-3 flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate" title={file.originalName}>
+                      <div
+                        className="text-sm font-medium text-gray-900 truncate"
+                        title={file.originalName}
+                      >
                         {file.originalName}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {file.format.toUpperCase()} • {formatFileSize(file.size)}
+                        {file.format.toUpperCase()} •{" "}
+                        {formatFileSize(file.size)}
                       </div>
                     </div>
                   </div>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    file.resourceType === 'image' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-purple-100 text-purple-800'
-                  }`}>
-                    {file.resourceType === 'image' ? 'Photo' : 'Video'}
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      file.resource_type === "image"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
+                    {file.resource_type === "image" ? "Photo" : "Video"}
                   </span>
                 </div>
-                
+
                 <div className="text-xs text-gray-500 mb-3">
                   <div className="flex items-center mb-1">
                     <Calendar className="h-3 w-3 mr-1" />
-                    {formatDate(file.uploadDate)}
+                    {formatDate(file.created_at)}
                   </div>
                   {file.width && file.height && (
-                    <div>Dimensions: {file.width} × {file.height}</div>
+                    <div>
+                      Dimensions: {file.width} × {file.height}
+                    </div>
                   )}
                 </div>
 
@@ -291,7 +356,9 @@ const FileList: React.FC = () => {
                     <Download className="h-4 w-4" />
                   </a>
                   <button
-                    onClick={() => deleteFile(file.cloudinaryId, file.originalName)}
+                    onClick={() =>
+                      deleteFile(file.public_id, file.originalName)
+                    }
                     className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-full transition-all duration-200"
                     title="Delete file"
                   >
