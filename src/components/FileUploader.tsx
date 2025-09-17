@@ -232,7 +232,7 @@ const FileUploader: React.FC = () => {
           </div>
 
           <div className="mt-6 text-xs text-gray-400">
-            Maximum file size: 500MB
+            Maximum file size: 10MB
           </div>
         </div>
       </div>
