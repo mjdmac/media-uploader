@@ -196,7 +196,7 @@ const FileUploader: React.FC = () => {
           <input
             type="file"
             multiple
-            accept="image/*,video/*"
+            accept="image/*"
             onChange={handleChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
@@ -217,17 +217,13 @@ const FileUploader: React.FC = () => {
             Drop your precious memories here
           </h2>
           <p className="text-lg text-gray-600 mb-4">
-            or click to browse your photos and videos
+            or click to browse your photos
           </p>
 
           <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
             <div className="flex items-center">
               <Camera className="h-5 w-5 mr-2 text-blue-400" />
               <span>Photos</span>
-            </div>
-            <div className="flex items-center">
-              <Video className="h-5 w-5 mr-2 text-slate-400" />
-              <span>Videos</span>
             </div>
           </div>
 
